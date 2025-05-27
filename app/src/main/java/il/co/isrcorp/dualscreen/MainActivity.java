@@ -8,14 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        setExternalScreenAsPrimary();
 
 
         Intent externalScreenIntent = new Intent(this, ExternalScreenActivity.class);
@@ -39,25 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
         displayActivity(displays[0],new Intent(this, MainScreenActivity.class));
         displayActivity(displays[1],externalScreenIntent);
-    }
-
-    private void setExternalScreenAsPrimary(){
-        /*
-         persist.external.screen.as=primary
-                  ==>
-                  primary screen: landscape
-                  secondary:portrait
-
-        */
-
-
-        String prop = getSystemProp("persist.external.screen.as", "secondary");
-
-        if(!prop.equals("primary")){
-            setSystemProp("persist.external.screen.as","primary");
-            Intent intent = new Intent("android.ext.screen.action.CHANGED");
-            getApplicationContext().sendBroadcast(intent);
-        }
     }
 
     private void displayActivity(Display display, Intent intent){
@@ -73,28 +47,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String getSystemProp(String key, String prop) {
-
-        BufferedReader reader;
-        String propertyValue = "";
-        try {
-            String cmd = "getprop " + key;
-            Process process = Runtime.getRuntime().exec(cmd);
-            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            propertyValue = reader.readLine().trim();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return propertyValue;
-    }
-
-    private void setSystemProp(String key, String prop) {
-        try {
-            String cmd = "setprop " + key + " " + prop;
-            Process process = Runtime.getRuntime().exec(cmd);
-            process.wait();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
